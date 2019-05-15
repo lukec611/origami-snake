@@ -1,0 +1,183 @@
+<html>
+    <head>
+        <style>
+            .wrap {
+                padding-top: 100px;
+                transform: rotate3d(1, 0.666, 0, 45deg);
+            }
+            .elem {
+                width: 100px;
+                height: 40px;
+                background-color: green;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="wrap">
+            <div class="elem">
+                hi
+            </div>
+        </div>
+
+        <svg class="sv" viewBox="0 0 200 200" style="width:600px;height:400px">
+            <!-- <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
+            <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
+            <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
+            <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
+            <line x1="0" y1="0" x2="20" y2="20" stroke="green" /> -->
+        </svg>
+
+        <!-- <div class="holder" style="display: flex;transform:rotate3d(0, 0, 0, 45deg);"> -->
+                <div class="holder" style="transform-origin: 0px 0px;transform: rotateX(30deg) rotateY(45deg);transform-style: preserve-3d;">
+        
+                </div>
+
+        <script>
+            const snakeElementLength = 20;
+            const numElements = 10;
+
+            const elements = Array.from({ length: numElements}, (_, index) => {
+                const el = document.createElementNS('http://www.w3.org/2000/svg','line');
+                el.setAttribute('x1', snakeElementLength * index);
+                el.setAttribute('y1', '10');
+                el.setAttribute('x2', (index + 1) * snakeElementLength);
+                el.setAttribute('y2', '10');
+                el.setAttribute('stroke', 'green');
+
+                const el2 = document.createElement('div');
+                el2.style.height = '16px';
+                el2.style.position = 'absolute';
+                el2.style.top = '0px';
+                el2.style.left = '0px';
+
+                // el2.style.backgroundColor = 'green';
+                el2.style.width = `${snakeElementLength}px`;
+
+                let setElColor = (c) => el2.style.backgroundColor = c;
+                // el2.style.transformStyle = 'preserve-3d';
+
+                if (index === 0) {
+                    const head = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    head.setAttribute('viewBox', "0 0 100 100");
+                    head.style.width =  '100%';
+                    head.style.height = '100%';
+                    head.style.display = 'block';
+                    const headPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+                    headPath.setAttribute('fill', 'black');
+                    headPath.setAttribute('d', 'M 0 50 L 100 120 L 100 -20 Z');
+
+                    head.appendChild(headPath);
+                    el2.appendChild(head);
+                    setElColor = (c) => headPath.setAttribute('fill', c);
+
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+                    circle.setAttribute('r', '10');
+                    circle.setAttribute('fill', 'black');
+                    circle.setAttribute('cx', '60');
+                    circle.setAttribute('cy', '30');
+                    head.appendChild(circle);
+
+                    function addLine(x1, y1, x2, y2, col = 'pink') {
+                        const p = document.createElementNS('http://www.w3.org/2000/svg','line');
+                        p.setAttribute('x1', x1);
+                        p.setAttribute('x2', x2);
+                        p.setAttribute('y1', y1);
+                        p.setAttribute('y2', y2);
+                        p.setAttribute('stroke', col);
+                        p.setAttribute('stroke-width', '4');
+                        head.appendChild(p);
+                    }
+
+                    addLine(0, 50, -10, 50, 'pink');
+                    addLine(-15, 40, -10, 50, 'pink');
+                    addLine(-15, 60, -10, 50, 'pink');
+
+
+                    // el2.innerHTML = `
+                    //     <svg viewBox="0 0 100 100" style="width:100%;height:100%;">
+                    //         <path stroke="green" d="M 0 50 L 100 120 L 100 -20 Z" />
+                    //     </svg>
+                    // `;
+                }
+
+
+                const svgE = document.querySelector('.sv');
+                const holder = document.querySelector('.holder');
+
+                svgE.appendChild(el);
+                holder.appendChild(el2);
+                return {
+                    el,
+                    el2,
+                    index,
+                    setElColor,
+                };
+            });
+
+            function point2VecAngle(p1, p2) {
+                const diff = { x: p2.x - p1.x, y: p2.y - p1.y };
+                const m = Math.sqrt(diff.x * diff.x + diff.y * diff.y);
+                const vec = { x: diff.x / m, y: diff.y / m };
+                const angle = Math.atan2(vec.y, vec.x) * 57.3;
+                return {
+                    p1,
+                    width: m,
+                    angle: 360-angle,
+                };
+            }
+
+            let t = 0;
+            const SWLEN = Math.PI * 2;
+            const animLen = 1000;
+            const FRAMES = 60;
+            const snakeLen = numElements * snakeElementLength;
+            setInterval(() => {
+                const tlevel = SWLEN * t / 1000;
+                function getHeight(i) {
+                    return Math.sin(i + t) * 20 + 100;
+                }
+                elements.forEach(e => {
+                    const i = -(e.index / numElements) * SWLEN;
+                    const i2 = -((e.index + 1) / numElements) * SWLEN;
+                    const h1 = getHeight(i);
+                    const h2 = getHeight(i2);
+                    e.el.setAttribute('y1', h1);
+                    e.el.setAttribute('y2', h2);
+                    const p1 = {
+                        x: e.index * snakeElementLength,
+                        y: h1,
+                    };
+                    const p2 = {
+                        x: (e.index + 1) * snakeElementLength,
+                        y: h2,
+                    };
+
+                    const diff = { x: p2.x - p1.x, y: p2.y - p1.y };
+                    const magScalar = 1 / Math.sqrt(diff.x * diff.x + diff.y * diff.y);
+                    const vec = { x: diff.x * magScalar, y: diff.y * magScalar };
+                    const normal = { x: -vec.y, y: vec.x };
+                    const greenScalar = (1 - Math.abs(normal.x)) * 255;
+                    const hex = Math.floor(greenScalar).toString(16);
+                    e.el.setAttribute('stroke', `#00${hex}00`);
+
+                    const arbot = point2VecAngle(p1, p2);
+                    e.el2.style.width = `${arbot.width}px`;
+                    console.log(arbot.angle);
+                    // e.el2.style.transform = `translate3d(${arbot.p1.x}px, 0px, ${arbot.p1.y}) rotateY(${arbot.angle}deg)`;
+                    e.el2.style.transform = `translate3d(${arbot.p1.x}px, 0px, ${arbot.p1.y}px) rotateY(${arbot.angle}deg)`;
+                    // e.el2.style.transform = `rotateY(${40}deg)`;
+                    e.el2.style.transformOrigin = `0px 0px`;
+                    // e.el2.style.backgroundColor = `#00${hex}00`;
+                    e.setElColor(`#00${hex}00`);
+                });
+                t = (t + 0.2) % 1000;
+            }, 60);
+
+        
+        </script>
+
+
+
+    </body>
+</html>
