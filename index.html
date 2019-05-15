@@ -20,6 +20,7 @@
         <div class="holder" style="transform-origin: 0px 0px;transform: rotateX(30deg) rotateY(45deg);transform-style: preserve-3d;">
         </div>
 
+        <script src="ticker.js"></script>
         <button onclick="pause()">pause</button>
         <script>
             const scalar = 4;
@@ -31,7 +32,7 @@
             const snakeElementHeight = widthToHeight(snakeWidth) * scalar;
             const numElements = 10;
             // const snakeText = 'Happy Mothers Day!'.toUpperCase().split('').reverse().join('');
-            const snakeText = 'Happy Mothers Day!'.toUpperCase();
+            const snakeText = 'Happy Mothers Day!     '.toUpperCase();
 
 
             const elements = Array.from({ length: numElements}, (_, index) => {
@@ -121,6 +122,7 @@
             const FRAMES = 60;
             const snakeLen = numElements * snakeElementLength;
             let textT = 0, textTi = 0;
+            const textTicker = new Ticker(0, snakeText.length, 5);
             let interv = setInterval(() => {
                 const tlevel = SWLEN * t / 1000;
                 function getHeight(i) {
@@ -153,13 +155,15 @@
                     e.el2.style.transform = `translate3d(${arbot.p1.x}px, 0px, ${arbot.p1.y}px) rotateY(${arbot.angle}deg)`;
                     e.el2.style.transformOrigin = `0px 0px`;
                     e.setElColor(`#00${hex}00`);
-                    const letterIndex = textTi + (e.index - 1);
+                    const __t = textTicker.getTick();
+                    const letterIndex = (__t + (e.index - 1)) % snakeText.length;
                     if (e.index !== 0) {
                         const letter = letterIndex < snakeText.length ? snakeText.charAt(letterIndex) : '';
                         e.setText(letter, `#00${hexDarker}00`);
                     }
                 });
                 t = (t + 0.2) % 1000;
+                textTicker.innerTick();
                 if (textT === 0) {
                     textTi = (textTi + 1) % (snakeText.length - 1);
                 }
