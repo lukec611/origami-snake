@@ -16,22 +16,18 @@
         </style>
     </head>
     <body>
-
         <div class="holder" style="transform-origin: 0px 0px;transform: rotateX(30deg) rotateY(45deg);transform-style: preserve-3d;">
         </div>
-
         <script src="ticker.js"></script>
-        <button onclick="pause()">pause</button>
+        <script src="la.js"></script>
         <script>
             const scalar = 4;
             const snakeWidth = 20;
             const curveAmnt = snakeWidth * 5;
             const snakeElementLength = snakeWidth * scalar;
-            const widthToHeight = w => (16 / 20) * w;
-            
+            const widthToHeight = w => w * 0.8;
             const snakeElementHeight = widthToHeight(snakeWidth) * scalar;
             const numElements = 10;
-            // const snakeText = 'Happy Mothers Day!'.toUpperCase().split('').reverse().join('');
             const snakeText = 'Happy Mothers Day!     '.toUpperCase();
 
 
@@ -50,12 +46,10 @@
                 let setText = (str, col = 'red') => el2.innerHTML = `<div style="color:${col};font-family:helvetica;font-size:40px;display:flex;justify-content:center;align-items:center;">${str}</div>`;
 
                 let setElColor = (c) => el2.style.backgroundColor = c;
-                // el2.style.transformStyle = 'preserve-3d';
 
                 if (index === 0) {
                     const head = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                     head.setAttribute('viewBox', "0 0 100 100");
-                    // head.style.width =  '100%';
                     head.style.height = '100%';
                     head.style.display = 'block';
                     const headPath = document.createElementNS('http://www.w3.org/2000/svg','path');
@@ -96,7 +90,6 @@
 
                 holder.appendChild(el2);
                 return {
-                    // el,
                     el2,
                     index,
                     setElColor,
@@ -104,24 +97,11 @@
                 };
             });
 
-            function point2VecAngle(p1, p2) {
-                const diff = { x: p2.x - p1.x, y: p2.y - p1.y };
-                const m = Math.sqrt(diff.x * diff.x + diff.y * diff.y);
-                const vec = { x: diff.x / m, y: diff.y / m };
-                const angle = Math.atan2(vec.y, vec.x) * 57.3;
-                return {
-                    p1,
-                    width: m,
-                    angle: 360-angle,
-                };
-            }
-
             let t = 0;
             const SWLEN = Math.PI * 2;
             const animLen = 1000;
             const FRAMES = 60;
             const snakeLen = numElements * snakeElementLength;
-            let textT = 0, textTi = 0;
             const textTicker = new Ticker(0, snakeText.length, 5);
             let interv = setInterval(() => {
                 const tlevel = SWLEN * t / 1000;
@@ -142,15 +122,12 @@
                         y: h2,
                     };
 
-                    const diff = { x: p2.x - p1.x, y: p2.y - p1.y };
-                    const magScalar = 1 / Math.sqrt(diff.x * diff.x + diff.y * diff.y);
-                    const vec = { x: diff.x * magScalar, y: diff.y * magScalar };
-                    const normal = { x: -vec.y, y: vec.x };
+                    const normal = getNormalFromVector(normalizeVector(toVector(p1, p2)));
                     const greenScalar = (1 - Math.abs(normal.x)) * 255;
                     const greenScalar2 = Math.min(greenScalar * 0.5, 255);
                     const hex = Math.floor(greenScalar).toString(16);
                     const hexDarker = Math.floor(greenScalar2).toString(16);
-                    const arbot = point2VecAngle(p1, p2);
+                    const arbot = toPolarCoords(p1, p2);
                     e.el2.style.width = `${arbot.width}px`;
                     e.el2.style.transform = `translate3d(${arbot.p1.x}px, 0px, ${arbot.p1.y}px) rotateY(${arbot.angle}deg)`;
                     e.el2.style.transformOrigin = `0px 0px`;
@@ -164,10 +141,6 @@
                 });
                 t = (t + 0.2) % 1000;
                 textTicker.innerTick();
-                if (textT === 0) {
-                    textTi = (textTi + 1) % (snakeText.length - 1);
-                }
-                textT = (textT + 1) % 5;
             }, 60);
 
             function pause() {
