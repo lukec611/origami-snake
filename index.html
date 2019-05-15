@@ -29,6 +29,8 @@
             const snakeElementLength = 20 * scalar;
             const snakeElementHeight = 16 * scalar;
             const numElements = 10;
+            // const snakeText = 'Happy Mothers Day!'.toUpperCase().split('').reverse().join('');
+            const snakeText = 'Happy Mothers Day!'.toUpperCase();
 
 
             const elements = Array.from({ length: numElements}, (_, index) => {
@@ -45,6 +47,7 @@
                 el2.style.position = 'absolute';
                 el2.style.top = '0px';
                 el2.style.left = '0px';
+                let setText = (str, col = 'red') => el2.innerHTML = `<div style="color:${col};font-family:helvetica;font-size:24px;display:flex;justify-content:center;align-items:center;">${str}</div>`;
 
 
                 let setElColor = (c) => el2.style.backgroundColor = c;
@@ -107,6 +110,7 @@
                     el2,
                     index,
                     setElColor,
+                    setText,
                 };
             });
 
@@ -127,10 +131,11 @@
             const animLen = 1000;
             const FRAMES = 60;
             const snakeLen = numElements * snakeElementLength;
+            let textT = 0, textTi = 0;
             setInterval(() => {
                 const tlevel = SWLEN * t / 1000;
                 function getHeight(i) {
-                    return Math.sin(i + t) * 20 + 100;
+                    return Math.sin(i + t) * 30 + 100;
                 }
                 elements.forEach(e => {
                     const i = -(e.index / numElements) * SWLEN;
@@ -153,20 +158,33 @@
                     const vec = { x: diff.x * magScalar, y: diff.y * magScalar };
                     const normal = { x: -vec.y, y: vec.x };
                     const greenScalar = (1 - Math.abs(normal.x)) * 255;
+                    const greenScalar2 = Math.min(greenScalar * 0.5, 255);
                     const hex = Math.floor(greenScalar).toString(16);
+                    const hexDarker = Math.floor(greenScalar2).toString(16);
                     e.el.setAttribute('stroke', `#00${hex}00`);
+                    console.log(greenScalar, greenScalar2, hex, hexDarker);
 
                     const arbot = point2VecAngle(p1, p2);
                     e.el2.style.width = `${arbot.width}px`;
-                    console.log(arbot.angle);
+                    // console.log(arbot.angle);
                     // e.el2.style.transform = `translate3d(${arbot.p1.x}px, 0px, ${arbot.p1.y}) rotateY(${arbot.angle}deg)`;
                     e.el2.style.transform = `translate3d(${arbot.p1.x}px, 0px, ${arbot.p1.y}px) rotateY(${arbot.angle}deg)`;
                     // e.el2.style.transform = `rotateY(${40}deg)`;
                     e.el2.style.transformOrigin = `0px 0px`;
                     // e.el2.style.backgroundColor = `#00${hex}00`;
                     e.setElColor(`#00${hex}00`);
+                    // const letterIndex = textTi + (elements.length - e.index - 2);
+                    const letterIndex = textTi + (e.index - 1);
+                    if (e.index !== 0) {
+                        const letter = letterIndex < snakeText.length ? snakeText.charAt(letterIndex) : '';
+                        e.setText(letter, `#00${hexDarker}00`);
+                    }
                 });
                 t = (t + 0.2) % 1000;
+                if (textT === 0) {
+                    textTi = (textTi + 1) % (snakeText.length - 1);
+                }
+                textT = (textT + 1) % 5;
             }, 60);
 
         
