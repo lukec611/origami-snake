@@ -12,7 +12,7 @@ class DomWrapper {
     }
 }
 
-class UpdatableDomWrapper {
+class UpdatableDomWrapper extends DomWrapper {
     constructor(elementName, optionalStyles) {
         super(elementName, optionalStyles);
     }

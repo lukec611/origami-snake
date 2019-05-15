@@ -20,6 +20,7 @@
         </div>
         <script src="ticker.js"></script>
         <script src="la.js"></script>
+        <script src="dom_wrappers.js"></script>
         <script>
             const scalar = 4;
             const snakeWidth = 20;
@@ -33,19 +34,19 @@
 
             const elements = Array.from({ length: numElements}, (_, index) => {
 
-                const el2 = document.createElement('div');
-                el2.style.width = `${snakeElementLength}px`;
-                el2.style.height = `${snakeElementHeight}px`;
-                el2.style.position = 'absolute';
-                el2.style.display = 'flex';
-                el2.style.justifyContent = 'center';
-                el2.style.alignItems = 'center';
+                const el2 = new UpdatableDomWrapper('div', {
+                    width: `${snakeElementLength}px`,
+                    height: `${snakeElementHeight}px`,
+                    position: 'absolute',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    top: '0px',
+                    left: '0px',
+                });
+                let setText = (str, col = 'red') => el2.setHtml(`<div style="color:${col};font-family:helvetica;font-size:40px;display:flex;justify-content:center;align-items:center;">${str}</div>`);
 
-                el2.style.top = '0px';
-                el2.style.left = '0px';
-                let setText = (str, col = 'red') => el2.innerHTML = `<div style="color:${col};font-family:helvetica;font-size:40px;display:flex;justify-content:center;align-items:center;">${str}</div>`;
-
-                let setElColor = (c) => el2.style.backgroundColor = c;
+                let setElColor = (c) => el2.setStyles({ backgroundColor: c });
 
                 if (index === 0) {
                     const head = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -58,8 +59,10 @@
 
                     head.appendChild(headPath);
                     el2.appendChild(head);
-                    el2.style.display = 'flex';
-                    el2.style.justifyContent = 'flex-end';
+                    el2.setStyles({
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                    });
                     setElColor = (c) => headPath.setAttribute('fill', c);
 
                     const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
@@ -88,7 +91,7 @@
 
                 const holder = document.querySelector('.holder');
 
-                holder.appendChild(el2);
+                holder.appendChild(el2.element);
                 return {
                     el2,
                     index,
@@ -128,9 +131,11 @@
                     const hex = Math.floor(greenScalar).toString(16);
                     const hexDarker = Math.floor(greenScalar2).toString(16);
                     const arbot = toPolarCoords(p1, p2);
-                    e.el2.style.width = `${arbot.width}px`;
-                    e.el2.style.transform = `translate3d(${arbot.p1.x}px, 0px, ${arbot.p1.y}px) rotateY(${arbot.angle}deg)`;
-                    e.el2.style.transformOrigin = `0px 0px`;
+                    e.el2.setStyles({
+                        width: `${arbot.width}px`,
+                        transform: `translate3d(${arbot.p1.x}px, 0px, ${arbot.p1.y}px) rotateY(${arbot.angle}deg)`,
+                        transformOrigin: `0px 0px`,
+                    });
                     e.setElColor(`#00${hex}00`);
                     const __t = textTicker.getTick();
                     const letterIndex = (__t + (e.index - 1)) % snakeText.length;
