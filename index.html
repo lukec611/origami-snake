@@ -10,44 +10,56 @@
                 height: 40px;
                 background-color: green;
             }
+            .holder {
+                margin-top: 50px;
+            }
         </style>
     </head>
     <body>
-        <svg class="sv" viewBox="0 0 200 200" style="width:600px;height:400px">
+        <!-- <svg class="sv" viewBox="0 0 200 200" style="width:600px;height:400px"> -->
             <!-- <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
             <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
             <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
             <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
             <line x1="0" y1="0" x2="20" y2="20" stroke="green" /> -->
-        </svg>
+        <!-- </svg> -->
 
         <div class="holder" style="transform-origin: 0px 0px;transform: rotateX(30deg) rotateY(45deg);transform-style: preserve-3d;">
         </div>
 
+        <button onclick="pause()">pause</button>
         <script>
-            const scalar = 2;
-            const snakeElementLength = 20 * scalar;
-            const snakeElementHeight = 16 * scalar;
+            const scalar = 4;
+            const snakeWidth = 20;
+            const curveAmnt = snakeWidth * 5;
+            const snakeElementLength = snakeWidth * scalar;
+            const widthToHeight = w => (16 / 20) * w;
+            
+            const snakeElementHeight = widthToHeight(snakeWidth) * scalar;
             const numElements = 10;
             // const snakeText = 'Happy Mothers Day!'.toUpperCase().split('').reverse().join('');
             const snakeText = 'Happy Mothers Day!'.toUpperCase();
 
 
             const elements = Array.from({ length: numElements}, (_, index) => {
-                const el = document.createElementNS('http://www.w3.org/2000/svg','line');
-                el.setAttribute('x1', snakeElementLength * index);
-                el.setAttribute('y1', '10');
-                el.setAttribute('x2', (index + 1) * snakeElementLength);
-                el.setAttribute('y2', '10');
-                el.setAttribute('stroke', 'green');
+                // const el = document.createElementNS('http://www.w3.org/2000/svg','line');
+                // el.setAttribute('x1', snakeElementLength * index);
+                // el.setAttribute('y1', '10');
+                // el.setAttribute('x2', (index + 1) * snakeElementLength);
+                // el.setAttribute('y2', '10');
+                // el.setAttribute('stroke', 'green');
 
                 const el2 = document.createElement('div');
                 el2.style.width = `${snakeElementLength}px`;
                 el2.style.height = `${snakeElementHeight}px`;
                 el2.style.position = 'absolute';
+                el2.style.display = 'flex';
+                el2.style.justifyContent = 'center';
+                el2.style.alignItems = 'center';
+
                 el2.style.top = '0px';
                 el2.style.left = '0px';
-                let setText = (str, col = 'red') => el2.innerHTML = `<div style="color:${col};font-family:helvetica;font-size:24px;display:flex;justify-content:center;align-items:center;">${str}</div>`;
+                let setText = (str, col = 'red') => el2.innerHTML = `<div style="color:${col};font-family:helvetica;font-size:40px;display:flex;justify-content:center;align-items:center;">${str}</div>`;
 
 
                 let setElColor = (c) => el2.style.backgroundColor = c;
@@ -56,12 +68,12 @@
                 if (index === 0) {
                     const head = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                     head.setAttribute('viewBox', "0 0 100 100");
-                    head.style.width =  '100%';
+                    // head.style.width =  '100%';
                     head.style.height = '100%';
                     head.style.display = 'block';
                     const headPath = document.createElementNS('http://www.w3.org/2000/svg','path');
                     headPath.setAttribute('fill', 'black');
-                    headPath.setAttribute('d', 'M 0 50 L 120 120 L 120 -20 Z');
+                    headPath.setAttribute('d', 'M 15 50 L 100 120 L 100 -20 Z');
 
                     head.appendChild(headPath);
                     el2.appendChild(head);
@@ -87,9 +99,9 @@
                         head.appendChild(p);
                     }
 
-                    addLine(0, 50, -10, 50, 'pink');
-                    addLine(-15, 40, -10, 50, 'pink');
-                    addLine(-15, 60, -10, 50, 'pink');
+                    addLine(15, 50, 5, 50, 'pink');
+                    addLine(0, 40, 5, 50, 'pink');
+                    addLine(0, 60, 5, 50, 'pink');
 
 
                     // el2.innerHTML = `
@@ -100,13 +112,13 @@
                 }
 
 
-                const svgE = document.querySelector('.sv');
+                // const svgE = document.querySelector('.sv');
                 const holder = document.querySelector('.holder');
 
-                svgE.appendChild(el);
+                // svgE.appendChild(el);
                 holder.appendChild(el2);
                 return {
-                    el,
+                    // el,
                     el2,
                     index,
                     setElColor,
@@ -132,18 +144,18 @@
             const FRAMES = 60;
             const snakeLen = numElements * snakeElementLength;
             let textT = 0, textTi = 0;
-            setInterval(() => {
+            let interv = setInterval(() => {
                 const tlevel = SWLEN * t / 1000;
                 function getHeight(i) {
-                    return Math.sin(i + t) * 30 + 100;
+                    return Math.sin(i + t) * curveAmnt + 100;
                 }
                 elements.forEach(e => {
                     const i = -(e.index / numElements) * SWLEN;
                     const i2 = -((e.index + 1) / numElements) * SWLEN;
                     const h1 = getHeight(i);
                     const h2 = getHeight(i2);
-                    e.el.setAttribute('y1', h1);
-                    e.el.setAttribute('y2', h2);
+                    // e.el.setAttribute('y1', h1);
+                    // e.el.setAttribute('y2', h2);
                     const p1 = {
                         x: e.index * snakeElementLength,
                         y: h1,
@@ -161,8 +173,8 @@
                     const greenScalar2 = Math.min(greenScalar * 0.5, 255);
                     const hex = Math.floor(greenScalar).toString(16);
                     const hexDarker = Math.floor(greenScalar2).toString(16);
-                    e.el.setAttribute('stroke', `#00${hex}00`);
-                    console.log(greenScalar, greenScalar2, hex, hexDarker);
+                    // e.el.setAttribute('stroke', `#00${hex}00`);
+                    // console.log(greenScalar, greenScalar2, hex, hexDarker);
 
                     const arbot = point2VecAngle(p1, p2);
                     e.el2.style.width = `${arbot.width}px`;
@@ -186,6 +198,10 @@
                 }
                 textT = (textT + 1) % 5;
             }, 60);
+
+            function pause() {
+                clearInterval(interv);
+            }
 
         
         </script>
