@@ -16,7 +16,7 @@
                 background-color: green;
             }
             .holder {
-                margin-top: 30%;
+                margin-top: 20vh;
                 transform-origin: 50% 50%;
                 transform: rotateX(35deg) rotateY(45deg);
                 transform-style: preserve-3d;
@@ -37,7 +37,16 @@
         <script>
             const widthToHeight = w => w * 0.8;
             const numElements = 10;
-            const snakeText = 'Happy Mothers Day!     '.toUpperCase();
+            const space = '     ';
+            let search = window.location.search;
+            search = search.length ? search.substring(1) : '';
+            let message = 'happy mothers day!';
+            switch(search) {
+                case 'a=1': message = 'happy mothers day mum, love luke'; break;
+                case 'a=2': message = 'chúc mừng ngày của mẹ, từ luke'; break;
+                default: message = ''; break;
+            }
+            const snakeText = message.toUpperCase() + space;
             
             let scalar = Math.min(window.innerWidth / 200, 4);
             let snakeWidth = 20;
