@@ -1,6 +1,11 @@
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
+            body {
+                padding: 0;
+                margin: 0;
+            }
             .wrap {
                 padding-top: 100px;
                 transform: rotate3d(1, 0.666, 0, 45deg);
@@ -11,28 +16,55 @@
                 background-color: green;
             }
             .holder {
-                margin-top: 50px;
+                margin-top: 30%;
+                transform-origin: 50% 50%;
+                transform: rotateX(35deg) rotateY(45deg);
+                transform-style: preserve-3d;
+                position: absolute;
+                left: -30px;
+            }
+            @media(min-width: 500px) {
+                .holder { left: 0px; }
             }
         </style>
     </head>
     <body>
-        <div class="holder" style="transform-origin: 0px 0px;transform: rotateX(30deg) rotateY(45deg);transform-style: preserve-3d;">
+        <div class="holder">
         </div>
         <script src="ticker.js"></script>
         <script src="la.js"></script>
         <script src="dom_wrappers.js"></script>
         <script>
-            const scalar = 4;
-            const snakeWidth = 20;
-            const curveAmnt = snakeWidth * 5;
-            const snakeElementLength = snakeWidth * scalar;
             const widthToHeight = w => w * 0.8;
-            const snakeElementHeight = widthToHeight(snakeWidth) * scalar;
             const numElements = 10;
             const snakeText = 'Happy Mothers Day!     '.toUpperCase();
+            
+            let scalar = Math.min(window.innerWidth / 200, 4);
+            let snakeWidth = 20;
+            let curveAmnt = snakeWidth * 3.5;
+            let snakeElementLength = snakeWidth * scalar;
+            let snakeElementHeight = widthToHeight(snakeWidth) * scalar;
 
-
-            const elements = Array.from({ length: numElements}, (_, index) => {
+            function init() {
+                const holder = document.querySelector('.holder');
+                holder.innerHTML = '';
+                const onMobile = window.innerWidth < 500;
+                scalar = Math.min(window.innerWidth / 140, 4);
+                snakeWidth = scalar * 6;
+                curveAmnt = onMobile ? snakeWidth * 2.5 : snakeWidth * 3.5;
+                snakeElementLength = snakeWidth * scalar;
+                snakeElementHeight = widthToHeight(snakeWidth) * scalar;
+                createElements();
+            };
+            window.onresize = init;
+            
+            
+            let elements = [];
+            createElements();
+            init();
+            function createElements() {
+                
+                elements = Array.from({ length: numElements}, (_, index) => {
 
                 const el2 = new UpdatableDomWrapper('div', {
                     width: `${snakeElementLength}px`,
@@ -44,7 +76,7 @@
                     top: '0px',
                     left: '0px',
                 });
-                let setText = (str, col = 'red') => el2.setHtml(`<div style="color:${col};font-family:helvetica;font-size:40px;display:flex;justify-content:center;align-items:center;">${str}</div>`);
+                let setText = (str, col = 'red') => el2.setHtml(`<div style="color:${col};font-family:helvetica;font-size:${10 * scalar}px;display:flex;justify-content:center;align-items:center;">${str}</div>`);
 
                 let setElColor = (c) => el2.setStyles({ backgroundColor: c });
 
@@ -98,7 +130,12 @@
                     setElColor,
                     setText,
                 };
-            });
+                });
+
+                // end 
+            }
+
+            
 
             let t = 0;
             const SWLEN = Math.PI * 2;
@@ -106,7 +143,9 @@
             const FRAMES = 60;
             const snakeLen = numElements * snakeElementLength;
             const textTicker = new Ticker(0, snakeText.length, 5);
-            let interv = setInterval(() => {
+
+
+            function tick() {
                 const tlevel = SWLEN * t / 1000;
                 function getHeight(i) {
                     return Math.sin(i + t) * curveAmnt + 100;
@@ -146,6 +185,10 @@
                 });
                 t = (t + 0.2) % 1000;
                 textTicker.innerTick();
+            }
+
+            let interv = setInterval(() => {
+                tick();
             }, 60);
 
             function pause() {
