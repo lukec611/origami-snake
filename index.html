@@ -13,13 +13,6 @@
         </style>
     </head>
     <body>
-
-        <div class="wrap">
-            <div class="elem">
-                hi
-            </div>
-        </div>
-
         <svg class="sv" viewBox="0 0 200 200" style="width:600px;height:400px">
             <!-- <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
             <line x1="0" y1="0" x2="20" y2="20" stroke="green" />
@@ -28,14 +21,15 @@
             <line x1="0" y1="0" x2="20" y2="20" stroke="green" /> -->
         </svg>
 
-        <!-- <div class="holder" style="display: flex;transform:rotate3d(0, 0, 0, 45deg);"> -->
-                <div class="holder" style="transform-origin: 0px 0px;transform: rotateX(30deg) rotateY(45deg);transform-style: preserve-3d;">
-        
-                </div>
+        <div class="holder" style="transform-origin: 0px 0px;transform: rotateX(30deg) rotateY(45deg);transform-style: preserve-3d;">
+        </div>
 
         <script>
-            const snakeElementLength = 20;
+            const scalar = 2;
+            const snakeElementLength = 20 * scalar;
+            const snakeElementHeight = 16 * scalar;
             const numElements = 10;
+
 
             const elements = Array.from({ length: numElements}, (_, index) => {
                 const el = document.createElementNS('http://www.w3.org/2000/svg','line');
@@ -46,13 +40,12 @@
                 el.setAttribute('stroke', 'green');
 
                 const el2 = document.createElement('div');
-                el2.style.height = '16px';
+                el2.style.width = `${snakeElementLength}px`;
+                el2.style.height = `${snakeElementHeight}px`;
                 el2.style.position = 'absolute';
                 el2.style.top = '0px';
                 el2.style.left = '0px';
 
-                // el2.style.backgroundColor = 'green';
-                el2.style.width = `${snakeElementLength}px`;
 
                 let setElColor = (c) => el2.style.backgroundColor = c;
                 // el2.style.transformStyle = 'preserve-3d';
@@ -65,10 +58,12 @@
                     head.style.display = 'block';
                     const headPath = document.createElementNS('http://www.w3.org/2000/svg','path');
                     headPath.setAttribute('fill', 'black');
-                    headPath.setAttribute('d', 'M 0 50 L 100 120 L 100 -20 Z');
+                    headPath.setAttribute('d', 'M 0 50 L 120 120 L 120 -20 Z');
 
                     head.appendChild(headPath);
                     el2.appendChild(head);
+                    el2.style.display = 'flex';
+                    el2.style.justifyContent = 'flex-end';
                     setElColor = (c) => headPath.setAttribute('fill', c);
 
                     const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
